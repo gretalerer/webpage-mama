@@ -48,7 +48,7 @@ function Founder() {
         <div className="founder-bio">
           <p>
           Marina Wasserman is a senior executive with more than 35 years of experience in banking, fintech, and cross-border payments. 
-          Throughout her career, she has held leadership roles at Citibank, Visa, and Mastercard, as well as at leading payment service providers including Paysafe, Yapstone, and OKTO.
+          Throughout her career, she has held leadership roles at Citibank, Visa, and Mastercard, as well as at leading payment service providers such as Paysafe.
           </p>
           <p>
           As Founder and Director of Movements.Capital, Marina partners with companies and entrepreneurs to identify and develop new business opportunities, 
