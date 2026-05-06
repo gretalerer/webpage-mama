@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion'
+import YoutubeAutoplayIframe from './YoutubeAutoplayIframe'
+import ShootingStarsBg from './ShootingStarsBg'
 import './About.css'
 
 const YOUTUBE_ID = 'mVXuN28Ismk'
+const START_SEC = 15
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,11 +18,7 @@ const fadeUp = {
 function About() {
   return (
     <section className="about section" id="company">
-      <div className="shooting-stars">
-        <div className="star star--1" />
-        <div className="star star--2" />
-        <div className="star star--3" />
-      </div>
+      <ShootingStarsBg />
 
       <div className="about-inner container">
         <motion.div
@@ -31,11 +30,12 @@ function About() {
           custom={0}
         >
           <div className="masked-title-video">
-            <iframe
-              src={`https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1&mute=1&loop=1&playlist=${YOUTUBE_ID}&controls=0&showinfo=0&rel=0&modestbranding=1&start=15&playsinline=1&disablekb=1&iv_load_policy=3`}
+            <YoutubeAutoplayIframe
+              videoId={YOUTUBE_ID}
+              start={START_SEC}
               title="Masked background video"
-              allow="autoplay; encrypted-media"
-              frameBorder="0"
+              remountWhenVisible
+              remountOnMobileInteraction
             />
           </div>
           <h2 className="masked-title">

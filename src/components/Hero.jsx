@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
+import YoutubeAutoplayIframe from './YoutubeAutoplayIframe'
 import './Hero.css'
 
 const YOUTUBE_ID = 'mVXuN28Ismk'
+const START_SEC = 15
 
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
@@ -16,13 +18,13 @@ function Hero() {
   return (
     <section className="hero">
       <div className="hero-video-wrapper">
-        <iframe
+        <YoutubeAutoplayIframe
           className="hero-video"
-          src={`https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1&mute=1&loop=1&playlist=${YOUTUBE_ID}&controls=0&showinfo=0&rel=0&modestbranding=1&start=15&playsinline=1&disablekb=1&iv_load_policy=3`}
+          videoId={YOUTUBE_ID}
+          start={START_SEC}
           title="Background video"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          frameBorder="0"
+          remountWhenVisible
+          remountOnMobileInteraction
         />
       </div>
       <div className="hero-overlay" />
