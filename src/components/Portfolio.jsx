@@ -69,13 +69,23 @@ function Portfolio() {
     <section className="portfolio section" id="portfolio">
       <WorldMap />
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        <motion.p
+          className="section-label"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          custom={0}
+        >
+          Our Portfolio
+        </motion.p>
         <motion.h2
           className="portfolio-title"
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          custom={0}
+          custom={1}
         >
           Collection
         </motion.h2>
@@ -85,7 +95,7 @@ function Portfolio() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          custom={1}
+          custom={2}
         >
           We lead projects end-to-end and orchestrate the ecosystem required for success.
           Our portfolio spans fintech and digital payments, entertainment, wellness, and hospitality,
@@ -101,11 +111,11 @@ function Portfolio() {
             if (offset < -total / 2) offset += total
 
             const absOffset = Math.abs(offset)
-            const rotateY = offset * 25
-            const translateZ = -absOffset * 80
-            const translateX = offset * 200
-            const opacity = absOffset > 3 ? 0 : 1 - absOffset * 0.2
-            const scale = 1 - absOffset * 0.08
+            const rotateY = offset * 12
+            const translateZ = -absOffset * 120
+            const translateX = offset * 660
+            const opacity = absOffset > 2 ? 0 : 1 - absOffset * 0.45
+            const scale = 1 - absOffset * 0.07
             const zIndex = total - absOffset
 
             return (
@@ -113,7 +123,7 @@ function Portfolio() {
                 key={i}
                 className={`portfolio-card ${offset === 0 ? 'portfolio-card--active' : ''}`}
                 style={{
-                  transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+                  transform: `translate(-50%, -50%) translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                   opacity,
                   zIndex,
                 }}

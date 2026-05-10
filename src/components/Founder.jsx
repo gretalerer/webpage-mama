@@ -22,6 +22,8 @@ function Founder() {
     <section className="founder section" id="about" ref={sectionRef}>
       <div className="founder-inner container">
 
+        <p className="section-label founder-eyebrow">The Founder</p>
+
         <div className="founder-hero">
           <motion.span
             className="founder-typo founder-typo-top"

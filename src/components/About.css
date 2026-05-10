@@ -17,7 +17,7 @@
   height: 160px;
   background: linear-gradient(to top, rgba(250, 248, 245, 0.7), transparent);
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .about-inner {

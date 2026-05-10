@@ -21,13 +21,23 @@ function About() {
       <ShootingStarsBg />
 
       <div className="about-inner container">
+        <motion.p
+          className="section-label"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          custom={0}
+        >
+          Our Company
+        </motion.p>
         <motion.div
           className="masked-title-wrapper"
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          custom={0}
+          custom={1}
         >
           <div className="masked-title-video">
             <YoutubeAutoplayIframe
@@ -48,7 +58,7 @@ function About() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          custom={1}
+          custom={2}
         >
           We partner with companies and entrepreneurs to explore, develop, and scale new
           business opportunities. We lead projects end-to-end, connecting customers, partners,
@@ -60,7 +70,7 @@ function About() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          custom={2}
+          custom={3}
         >
           We originate opportunities, build ventures, and scale them by orchestrating
           the right ecosystem.
@@ -72,7 +82,7 @@ function About() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          custom={3}
+          custom={4}
         >
           Collection
         </motion.a>

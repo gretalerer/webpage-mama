@@ -1,5 +1,5 @@
 .founder {
-  background: #ffffff;
+  background: var(--color-bg);
   position: relative;
   overflow: hidden;
 }
@@ -12,6 +12,10 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+.founder-eyebrow {
+  margin-bottom: 2rem;
 }
 
 /* ── Typographic hero block ── */
@@ -123,14 +127,6 @@
     font-size: clamp(2.5rem, 6vw, 5rem);
   }
 
-  .founder-typo-top {
-    margin-right: 6%;
-  }
-
-  .founder-typo-bottom {
-    margin-left: 6%;
-  }
-
   .founder-image-frame {
     width: clamp(180px, 26vw, 300px);
   }
@@ -139,18 +135,13 @@
 @media (max-width: 768px) {
   .founder-hero {
     margin-bottom: 2rem;
+    padding-top: clamp(2rem, 9vw, 3rem);
+    padding-bottom: clamp(2rem, 9vw, 3rem);
   }
 
-  .founder-typo-top {
-    font-size: clamp(2.2rem, 10vw, 3.5rem);
-    margin-right: 3%;
-    margin-bottom: -0.55em;
-  }
-
+  .founder-typo-top,
   .founder-typo-bottom {
     font-size: clamp(2.2rem, 10vw, 3.5rem);
-    margin-left: 3%;
-    margin-top: -0.55em;
   }
 
   .founder-image-frame {
@@ -163,11 +154,14 @@
 }
 
 @media (max-width: 480px) {
+  .founder-hero {
+    padding-top: clamp(1.75rem, 10vw, 2.5rem);
+    padding-bottom: clamp(1.75rem, 10vw, 2.5rem);
+  }
+
   .founder-typo-top,
   .founder-typo-bottom {
     font-size: clamp(2rem, 12vw, 3rem);
-    margin-bottom: -0.5em;
-    margin-top: -0.5em;
   }
 
   .founder-image-frame {

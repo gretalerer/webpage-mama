@@ -1,5 +1,5 @@
-import { useRef, useState, useCallback } from 'react'
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import ShootingStarsBg from './ShootingStarsBg'
 import './Join.css'
 
@@ -31,29 +31,7 @@ const SLIDES = [
 ]
 
 function Join() {
-  const scrollRootRef = useRef(null)
   const [active, setActive] = useState(0)
-
-  const { scrollYProgress } = useScroll({
-    target: scrollRootRef,
-    offset: ['start start', 'end end'],
-  })
-
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    const n = SLIDES.length
-    const idx = Math.min(n - 1, Math.max(0, Math.floor(v * n)))
-    setActive(idx)
-  })
-
-  const scrollToSlide = useCallback((index) => {
-    const root = scrollRootRef.current
-    if (!root) return
-    const top = root.getBoundingClientRect().top + window.scrollY
-    const h = root.offsetHeight
-    const n = SLIDES.length
-    const y = top + (index / n) * h + 2
-    window.scrollTo({ top: y, behavior: 'smooth' })
-  }, [])
 
   const current = SLIDES[active]
 
@@ -70,11 +48,7 @@ function Join() {
         </p>
       </div>
 
-      <div
-        ref={scrollRootRef}
-        className="join-scroll-track join-layer"
-        style={{ '--join-slide-count': SLIDES.length }}
-      >
+      <div className="join-scroll-track join-layer">
         <div className="join-showcase-sticky">
           <div className="container join-showcase-grid">
             <nav className="join-showcase-nav" aria-label="Journey roles">
@@ -84,7 +58,7 @@ function Join() {
                     <button
                       type="button"
                       className={`join-nav-item ${active === i ? 'join-nav-item--active' : ''}`}
-                      onClick={() => scrollToSlide(i)}
+                      onClick={() => setActive(i)}
                     >
                       <span className="join-nav-line">
                         <span className="join-nav-heading">
@@ -136,7 +110,7 @@ function Join() {
                     role="tab"
                     aria-selected={active === i}
                     className={`join-progress-dot ${active === i ? 'join-progress-dot--active' : ''}`}
-                    onClick={() => scrollToSlide(i)}
+                    onClick={() => setActive(i)}
                     aria-label={`${slide.title}`}
                   />
                 ))}

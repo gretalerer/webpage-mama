@@ -2,6 +2,10 @@
   background: #ffffff;
   overflow: hidden;
   position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .portfolio-title {
@@ -16,41 +20,43 @@
   text-align: center;
   color: var(--color-text-muted);
   max-width: 700px;
-  margin: 0 auto 3rem;
+  margin: 0 auto 0;
   line-height: 2;
   font-size: 0.75rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
+/* Carousel fills all remaining height */
 .portfolio-carousel {
   position: relative;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 0 4rem;
+  overflow: hidden;
+  padding: 2rem 0;
 }
 
 .portfolio-stage {
   position: relative;
-  width: 360px;
-  height: 300px;
-  perspective: 1200px;
+  width: 100%;
+  height: 100%;
+  perspective: 1400px;
   transform-style: preserve-3d;
 }
 
+/* Cards are centered via translate(-50%,-50%) inside the JS transform */
 .portfolio-card {
   position: absolute;
-  width: 340px;
-  height: 270px;
+  width: clamp(260px, 40vw, 520px);
+  height: clamp(380px, 76%, 720px);
   border-radius: 0;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: all 0.65s cubic-bezier(0.25, 0.1, 0.25, 1);
   top: 50%;
   left: 50%;
-  margin-left: -170px;
-  margin-top: -135px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
@@ -64,8 +70,8 @@
 
 .portfolio-card--active {
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.15),
-    0 0 20px rgba(201, 168, 76, 0.1);
+    0 20px 60px rgba(0, 0, 0, 0.18),
+    0 0 30px rgba(201, 168, 76, 0.12);
 }
 
 .portfolio-card-label {
@@ -73,8 +79,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1.2rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  padding: 2rem 1.75rem 1.75rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -85,27 +91,19 @@
 
 .portfolio-card-label span {
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: #ffffff;
   font-weight: 500;
+  letter-spacing: 0.02em;
 }
-
 
 @media (max-width: 768px) {
   .portfolio-title {
     font-size: 2rem;
   }
 
-  .portfolio-stage {
-    width: 300px;
-    height: 250px;
-  }
-
   .portfolio-card {
-    width: 280px;
-    height: 220px;
-    margin-left: -140px;
-    margin-top: -110px;
+    width: clamp(220px, 70vw, 360px);
+    height: clamp(300px, 65%, 560px);
   }
-
 }

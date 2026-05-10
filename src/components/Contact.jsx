@@ -1,12 +1,13 @@
 import { useState } from 'react'
+import contactBg from '../assets/contact-bg.png'
 import './Contact.css'
 
 function Contact() {
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
+    fullName: '',
     email: '',
-    role: '',
+    organization: '',
+    inquiry: 'Investor Relations',
     message: '',
   })
 
@@ -16,78 +17,126 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    alert('Thank you for reaching out! We will be in touch shortly.')
-    setForm({ firstName: '', lastName: '', email: '', role: '', message: '' })
   }
 
   return (
     <section className="contact section" id="contact">
-      <div className="contact-inner container">
-        <div className="contact-image">
-          <div className="contact-image-bg" />
+      <div className="container contact-inner">
+
+        <div className="contact-header">
+          <div className="contact-header-left">
+            <span className="contact-eyebrow">Connect with us</span>
+            <h2 className="contact-heading">
+              Shape the next <em>movement.</em>
+            </h2>
+            <p className="contact-subtext">
+              We partner with founders building the future of industrial technology and
+              complex infrastructure. Our network is curated; our focus is unwavering.
+            </p>
+          </div>
+          <div className="contact-header-right">
+            <a href="mailto:inquiries@movements.cap" className="contact-email-link">
+              ↗ INQUIRIES@MOVEMENTS.CAP
+            </a>
+          </div>
         </div>
-        <div className="contact-form-wrapper">
-          <h2 className="section-title">GET IN TOUCH</h2>
-          <p className="section-subtitle" style={{ marginBottom: '2rem' }}>
-            Please submit your contact information and we will be in touch with you shortly.
-          </p>
+
+        <div className="contact-body">
+
+          <div className="contact-location-card">
+            <img
+              src={contactBg}
+              alt="Movement"
+              className="contact-location-img"
+            />
+          </div>
+
           <form className="contact-form" onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label>First name *</label>
+
+            <div className="contact-form-row">
+              <div className="contact-field">
+                <label className="contact-label">Full Name</label>
                 <input
+                  className="contact-input"
                   type="text"
-                  name="firstName"
-                  value={form.firstName}
+                  name="fullName"
+                  placeholder="ALEXANDER VANCE"
+                  value={form.fullName}
                   onChange={handleChange}
-                  required
                 />
               </div>
-              <div className="form-group">
-                <label>Last name *</label>
+              <div className="contact-field">
+                <label className="contact-label">Institutional Email</label>
                 <input
-                  type="text"
-                  name="lastName"
-                  value={form.lastName}
+                  className="contact-input"
+                  type="email"
+                  name="email"
+                  placeholder="NAME@INSTITUTION.COM"
+                  value={form.email}
                   onChange={handleChange}
-                  required
                 />
               </div>
             </div>
-            <div className="form-group">
-              <label>Email *</label>
+
+            <div className="contact-field">
+              <label className="contact-label">Organization</label>
               <input
-                type="email"
-                name="email"
-                value={form.email}
+                className="contact-input"
+                type="text"
+                name="organization"
+                placeholder="FIRM NAME"
+                value={form.organization}
                 onChange={handleChange}
-                required
               />
             </div>
-            <div className="form-group">
-              <label>Apply to us *</label>
-              <select name="role" value={form.role} onChange={handleChange} required>
-                <option value="">Select a role</option>
-                <option value="investor">Investor</option>
-                <option value="partner">Partner</option>
-                <option value="supplier">Supplier</option>
-                <option value="customer">Customer</option>
-              </select>
+
+            <div className="contact-field">
+              <label className="contact-label">Nature of Inquiry</label>
+              <div className="contact-select-wrap">
+                <select
+                  className="contact-select"
+                  name="inquiry"
+                  value={form.inquiry}
+                  onChange={handleChange}
+                >
+                  <option>Investor Relations</option>
+                  <option>Partnership</option>
+                  <option>Supplier</option>
+                  <option>Customer</option>
+                  <option>General</option>
+                </select>
+                <span className="contact-select-arrow">&#8964;</span>
+              </div>
             </div>
-            <div className="form-group">
-              <label>Message</label>
+
+            <div className="contact-field contact-field--message">
+              <label className="contact-label">Message</label>
               <textarea
+                className="contact-textarea"
                 name="message"
-                rows="4"
+                placeholder="HOW CAN WE ACCELERATE YOUR MOVEMENT?"
+                rows={4}
                 value={form.message}
                 onChange={handleChange}
               />
             </div>
-            <button type="submit" className="btn-primary" style={{ width: '100%' }}>
-              Submit
-            </button>
+
+            <div className="contact-form-footer">
+              <span className="contact-secure">
+                <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
+                  <rect x="1" y="6" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2"/>
+                  <path d="M3.5 6V4a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+                Secured Encryption Active
+              </span>
+              <button type="submit" className="contact-submit">
+                SUBMIT REQUEST →
+              </button>
+            </div>
+
           </form>
         </div>
+
       </div>
     </section>
   )
