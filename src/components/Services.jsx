@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
 import TextReveal from './TextReveal'
 import QuantumNodes from './QuantumNodes'
+import { useCarousel } from '../hooks/useCarousel'
 import scalingImg from '../assets/scaling-expansion.png'
 import './Services.css'
 
@@ -47,27 +47,12 @@ const projects = [
   },
 ]
 
-
 function Services() {
-  const [active, setActive] = useState(0)
-  const [prev, setPrev] = useState(0)
-  const [transitioning, setTransitioning] = useState(false)
-  const total = projects.length
-
-  const goTo = useCallback((idx) => {
-    if (transitioning || idx === active) return
-    setPrev(active)
-    setActive(idx)
-    setTransitioning(true)
-    setTimeout(() => setTransitioning(false), 900)
-  }, [transitioning, active])
-
-  const next = useCallback(() => goTo((active + 1) % total), [active, total, goTo])
-
-  useEffect(() => {
-    const timer = setInterval(next, 4000)
-    return () => clearInterval(timer)
-  }, [next])
+  const { active, prev, transitioning, goTo } = useCarousel({
+    itemCount: projects.length,
+    autoPlayInterval: 4000,
+    transitionMs: 900,
+  })
 
   const project = projects[active]
   const prevProject = projects[prev]
@@ -85,16 +70,16 @@ function Services() {
 
       <div className="drift-showcase">
         <div className="drift-bg drift-bg--prev">
-          <img src={prevProject.image} alt={prevProject.title} />
+          <img src={prevProject.image} alt="" />
         </div>
         <div className={`drift-bg ${transitioning ? 'drift-bg--entering' : 'drift-bg--active'}`}>
-          <img src={project.image} alt={project.title} />
+          <img src={project.image} alt="" />
         </div>
         <div className="drift-overlay" />
 
         <div className="drift-card drift-card--in">
           <div className="drift-card-thumb">
-            <img src={project.image} alt={project.title} />
+            <img src={project.image} alt="" />
           </div>
           <div className="drift-card-info">
             <div className="drift-card-top">
@@ -110,12 +95,14 @@ function Services() {
         </div>
 
         <div className="drift-dots">
-          {projects.map((_, i) => (
+          {projects.map((p, i) => (
             <button
-              key={i}
+              key={p.number}
+              type="button"
               className={`drift-dot ${i === active ? 'drift-dot--active' : ''}`}
               onClick={() => goTo(i)}
-              aria-label={`Go to project ${i + 1}`}
+              aria-label={`Go to ${p.title}`}
+              aria-current={i === active ? 'true' : undefined}
             />
           ))}
         </div>

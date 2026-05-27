@@ -1,22 +1,24 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import founderImg from '../assets/founder.jpg'
 import './Founder.css'
 
 function Founder() {
   const sectionRef = useRef(null)
+  const reducedMotion = usePrefersReducedMotion()
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'start 0.35'],
   })
 
-  const xTop = useTransform(scrollYProgress, [0, 1], ['50vw', '0vw'])
-  const yTop = useTransform(scrollYProgress, [0, 1], ['-40px', '0px'])
-  const xBottom = useTransform(scrollYProgress, [0, 1], ['-50vw', '0vw'])
-  const yBottom = useTransform(scrollYProgress, [0, 1], ['40px', '0px'])
-  const imgScale = useTransform(scrollYProgress, [0, 0.6], [0.92, 1])
-  const imgOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1])
+  const xTop = useTransform(scrollYProgress, [0, 1], reducedMotion ? ['0vw', '0vw'] : ['50vw', '0vw'])
+  const yTop = useTransform(scrollYProgress, [0, 1], reducedMotion ? ['0px', '0px'] : ['-40px', '0px'])
+  const xBottom = useTransform(scrollYProgress, [0, 1], reducedMotion ? ['0vw', '0vw'] : ['-50vw', '0vw'])
+  const yBottom = useTransform(scrollYProgress, [0, 1], reducedMotion ? ['0px', '0px'] : ['40px', '0px'])
+  const imgScale = useTransform(scrollYProgress, [0, 0.6], reducedMotion ? [1, 1] : [0.92, 1])
+  const imgOpacity = useTransform(scrollYProgress, [0, 0.3], reducedMotion ? [1, 1] : [0, 1])
 
   return (
     <section className="founder section" id="about" ref={sectionRef}>
@@ -49,11 +51,11 @@ function Founder() {
 
         <div className="founder-bio">
           <p>
-          Marina Wasserman is a senior executive with more than 35 years of experience in banking, fintech, and cross-border payments. 
+          Marina Wasserman is a senior executive with more than 35 years of experience in banking, fintech, and cross-border payments.
           Throughout her career, she has held leadership roles at Citibank, Visa, and Mastercard, as well as at leading payment service providers such as Paysafe.
           </p>
           <p>
-          As Founder and Director of Movements.Capital, Marina partners with companies and entrepreneurs to identify and develop new business opportunities, 
+          As Founder and Director of Movements.Capital, Marina partners with companies and entrepreneurs to identify and develop new business opportunities,
           leading projects from concept to execution by bringing together customers, partners, investors, and suppliers to build successful ventures.
           The firm maintains a curated portfolio of projects across the fintech, digital payments, entertainment, wellness, and hospitality industries, spanning Latin America,
           Europe, the United States, Asia, and the UAE.

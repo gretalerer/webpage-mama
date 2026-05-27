@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState, useMemo } from 'react'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import './TextReveal.css'
 
 function TextReveal({ text, className = '' }) {
   const containerRef = useRef(null)
-  const [progress, setProgress] = useState(0)
+  const reducedMotion = usePrefersReducedMotion()
+  const [progress, setProgress] = useState(reducedMotion ? 1 : 0)
 
   const words = useMemo(() => {
     const lines = text.split('\n')
@@ -18,6 +20,11 @@ function TextReveal({ text, className = '' }) {
   }, [text])
 
   useEffect(() => {
+    if (reducedMotion) {
+      setProgress(1)
+      return
+    }
+
     const container = containerRef.current
     if (!container) return
 
@@ -34,10 +41,8 @@ function TextReveal({ text, className = '' }) {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [reducedMotion])
 
   return (
     <h2 ref={containerRef} className={`text-reveal ${className}`}>
@@ -46,7 +51,7 @@ function TextReveal({ text, className = '' }) {
         const opacity = Math.max(0.15, Math.min(1, wordProgress - i + 1))
 
         return (
-          <span key={i} className="text-reveal-word" style={{ opacity }}>
+          <span key={`${item.lineIdx}-${item.word}-${i}`} className="text-reveal-word" style={{ opacity }}>
             {item.word}
             {' '}
           </span>

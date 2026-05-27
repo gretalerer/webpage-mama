@@ -1,15 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { feature } from 'topojson-client'
 import worldData from 'world-atlas/land-110m.json'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import './WorldMap.css'
 
-const land = feature(worldData, worldData.objects.land)
+const GOLD_BASE = '201, 168, 76'
+const gold = (alpha) => `rgba(${GOLD_BASE}, ${alpha})`
 
-function lngLatToXY(lng, lat, w, h) {
-  const x = ((lng + 180) / 360) * w
-  const y = ((90 - lat) / 180) * h
-  return [x, y]
-}
+const land = feature(worldData, worldData.objects.land)
 
 const dotRoutes = [
   { points: [[0.12,0.22],[0.16,0.18],[0.20,0.22],[0.22,0.30],[0.18,0.38],[0.14,0.42]], speed: 0.0008 },
@@ -22,96 +20,124 @@ const dotRoutes = [
   { points: [[0.70,0.36],[0.76,0.44],[0.80,0.54]], speed: 0.001 },
 ]
 
+function lngLatToXY(lng, lat, w, h) {
+  const x = ((lng + 180) / 360) * w
+  const y = ((90 - lat) / 180) * h
+  return [x, y]
+}
+
+function drawLand(ctx, w, h) {
+  land.features.forEach(({ geometry: geom }) => {
+    const polygons = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates
+    polygons.forEach((polygon) => {
+      polygon.forEach((ring) => {
+        ctx.beginPath()
+        ring.forEach(([lng, lat], i) => {
+          const [x, y] = lngLatToXY(lng, lat, w, h)
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+        })
+        ctx.closePath()
+        ctx.fillStyle = gold(0.06)
+        ctx.fill()
+        ctx.strokeStyle = gold(0.18)
+        ctx.lineWidth = 0.6
+        ctx.stroke()
+      })
+    })
+  })
+}
+
+function buildDots() {
+  return dotRoutes.flatMap(({ points, speed }) =>
+    Array.from({ length: 3 }, (_, i) => ({
+      points,
+      progress: i / 3,
+      speed: speed * (0.8 + Math.random() * 0.4),
+    }))
+  )
+}
+
+function drawDots(ctx, dots, w, h) {
+  dots.forEach((dot) => {
+    const totalSeg = dot.points.length - 1
+    if (totalSeg <= 0) return
+
+    const rawIdx = dot.progress * totalSeg
+    const i0 = Math.floor(rawIdx)
+    const i1 = Math.min(i0 + 1, dot.points.length - 1)
+    const frac = rawIdx - i0
+
+    const x = (dot.points[i0][0] + (dot.points[i1][0] - dot.points[i0][0]) * frac) * w
+    const y = (dot.points[i0][1] + (dot.points[i1][1] - dot.points[i0][1]) * frac) * h
+
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, 14)
+    grad.addColorStop(0, gold(0.55))
+    grad.addColorStop(0.35, gold(0.12))
+    grad.addColorStop(1, gold(0))
+    ctx.beginPath()
+    ctx.arc(x, y, 14, 0, Math.PI * 2)
+    ctx.fillStyle = grad
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2)
+    ctx.fillStyle = gold(0.7)
+    ctx.fill()
+  })
+}
+
 function WorldMap() {
   const canvasRef = useRef(null)
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+
     const ctx = canvas.getContext('2d')
     let animId
     let dpr = window.devicePixelRatio || 1
 
-    const resize = () => {
+    const offscreen = document.createElement('canvas')
+    const offCtx = offscreen.getContext('2d')
+
+    let w = 0
+    let h = 0
+    const dots = buildDots()
+
+    const applySize = () => {
       dpr = window.devicePixelRatio || 1
-      canvas.width = canvas.offsetWidth * dpr
-      canvas.height = canvas.offsetHeight * dpr
+      w = canvas.offsetWidth
+      h = canvas.offsetHeight
+
+      canvas.width = w * dpr
+      canvas.height = h * dpr
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      offscreen.width = w
+      offscreen.height = h
+      drawLand(offCtx, w, h)
     }
-    resize()
-    window.addEventListener('resize', resize)
 
-    const W = () => canvas.offsetWidth
-    const H = () => canvas.offsetHeight
+    const paint = () => {
+      ctx.clearRect(0, 0, w, h)
+      ctx.drawImage(offscreen, 0, 0)
+      drawDots(ctx, dots, w, h)
+    }
 
-    const dots = dotRoutes.flatMap((route) =>
-      Array.from({ length: 3 }, (_, i) => ({
-        points: route.points,
-        progress: i / 3,
-        speed: route.speed * (0.8 + Math.random() * 0.4),
-      }))
-    )
+    applySize()
+    window.addEventListener('resize', applySize)
 
-    function drawLand(w, h) {
-      land.features.forEach((feat) => {
-        const geom = feat.geometry
-        const coords = geom.type === 'Polygon'
-          ? [geom.coordinates]
-          : geom.coordinates
-
-        coords.forEach((polygon) => {
-          polygon.forEach((ring) => {
-            ctx.beginPath()
-            ring.forEach(([lng, lat], i) => {
-              const [x, y] = lngLatToXY(lng, lat, w, h)
-              if (i === 0) ctx.moveTo(x, y)
-              else ctx.lineTo(x, y)
-            })
-            ctx.closePath()
-            ctx.fillStyle = 'rgba(201, 168, 76, 0.06)'
-            ctx.fill()
-            ctx.strokeStyle = 'rgba(201, 168, 76, 0.18)'
-            ctx.lineWidth = 0.6
-            ctx.stroke()
-          })
-        })
-      })
+    if (reducedMotion) {
+      paint()
+      return () => window.removeEventListener('resize', applySize)
     }
 
     const draw = () => {
-      const w = W()
-      const h = H()
-      ctx.clearRect(0, 0, w, h)
-
-      drawLand(w, h)
-
       dots.forEach((dot) => {
         dot.progress = (dot.progress + dot.speed) % 1
-        const totalSeg = dot.points.length - 1
-        if (totalSeg <= 0) return
-        const rawIdx = dot.progress * totalSeg
-        const i0 = Math.floor(rawIdx)
-        const i1 = Math.min(i0 + 1, dot.points.length - 1)
-        const frac = rawIdx - i0
-
-        const x = (dot.points[i0][0] + (dot.points[i1][0] - dot.points[i0][0]) * frac) * w
-        const y = (dot.points[i0][1] + (dot.points[i1][1] - dot.points[i0][1]) * frac) * h
-
-        const grad = ctx.createRadialGradient(x, y, 0, x, y, 14)
-        grad.addColorStop(0, 'rgba(201, 168, 76, 0.55)')
-        grad.addColorStop(0.35, 'rgba(201, 168, 76, 0.12)')
-        grad.addColorStop(1, 'rgba(201, 168, 76, 0)')
-        ctx.beginPath()
-        ctx.arc(x, y, 14, 0, Math.PI * 2)
-        ctx.fillStyle = grad
-        ctx.fill()
-
-        ctx.beginPath()
-        ctx.arc(x, y, 2.5, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(201, 168, 76, 0.7)'
-        ctx.fill()
       })
-
+      paint()
       animId = requestAnimationFrame(draw)
     }
 
@@ -119,9 +145,9 @@ function WorldMap() {
 
     return () => {
       cancelAnimationFrame(animId)
-      window.removeEventListener('resize', resize)
+      window.removeEventListener('resize', applySize)
     }
-  }, [])
+  }, [reducedMotion])
 
   return <canvas ref={canvasRef} className="world-map-canvas" />
 }

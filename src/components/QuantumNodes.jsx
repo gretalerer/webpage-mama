@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 
 const DEFAULTS = {
   particleCount: 80,
@@ -23,6 +24,7 @@ function QuantumNodes({
   particleSize = DEFAULTS.particleSize,
 }) {
   const canvasRef = useRef(null)
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -40,10 +42,10 @@ function QuantumNodes({
       canvas.style.width = `${rect.width}px`
       canvas.style.height = `${rect.height}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      return rect
     }
 
-    const initParticles = () => {
-      const rect = canvas.parentElement.getBoundingClientRect()
+    const initParticles = (rect) => {
       particles = Array.from({ length: particleCount }, () => ({
         x: Math.random() * rect.width,
         y: Math.random() * rect.height,
@@ -53,23 +55,25 @@ function QuantumNodes({
       }))
     }
 
-    const draw = () => {
-      const w = canvas.parentElement.getBoundingClientRect().width
-      const h = canvas.parentElement.getBoundingClientRect().height
+    const drawFrame = (w, h) => {
       ctx.clearRect(0, 0, w, h)
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
-        p.x += p.vx
-        p.y += p.vy
 
-        if (p.x < 0 || p.x > w) p.vx *= -1
-        if (p.y < 0 || p.y > h) p.vy *= -1
+        if (!reducedMotion) {
+          p.x += p.vx
+          p.y += p.vy
+          if (p.x < 0 || p.x > w) p.vx *= -1
+          if (p.y < 0 || p.y > h) p.vy *= -1
+        }
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(${particleColor}, ${particleOpacity})`
         ctx.fill()
+
+        if (reducedMotion) continue
 
         for (let j = i + 1; j < particles.length; j++) {
           const q = particles[j]
@@ -88,24 +92,47 @@ function QuantumNodes({
           }
         }
       }
+    }
 
+    const onResize = () => {
+      const rect = resize()
+      initParticles(rect)
+      if (reducedMotion) drawFrame(rect.width, rect.height)
+    }
+
+    const rect = resize()
+    initParticles(rect)
+
+    if (reducedMotion) {
+      drawFrame(rect.width, rect.height)
+      window.addEventListener('resize', onResize)
+      return () => window.removeEventListener('resize', onResize)
+    }
+
+    const draw = () => {
+      const { width: w, height: h } = canvas.parentElement.getBoundingClientRect()
+      drawFrame(w, h)
       animId = requestAnimationFrame(draw)
     }
 
-    resize()
-    initParticles()
     draw()
-
-    window.addEventListener('resize', () => {
-      resize()
-      initParticles()
-    })
+    window.addEventListener('resize', onResize)
 
     return () => {
       cancelAnimationFrame(animId)
-      window.removeEventListener('resize', resize)
+      window.removeEventListener('resize', onResize)
     }
-  }, [particleCount, connectionDistance, speed, particleColor, lineColor, particleOpacity, lineOpacity, particleSize])
+  }, [
+    reducedMotion,
+    particleCount,
+    connectionDistance,
+    speed,
+    particleColor,
+    lineColor,
+    particleOpacity,
+    lineOpacity,
+    particleSize,
+  ])
 
   return (
     <canvas

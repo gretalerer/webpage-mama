@@ -1,6 +1,7 @@
 .join {
   position: relative;
   background: var(--color-bg);
+  overflow: hidden;
   overflow-x: clip;
   min-height: 100vh;
   min-height: 100dvh;

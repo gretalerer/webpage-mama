@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import WorldMap from './WorldMap'
+import { useCarousel } from '../hooks/useCarousel'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
+import { fadeUp, motionVariants } from '../animations'
 import './Portfolio.css'
 
 const categories = [
@@ -34,36 +36,17 @@ const categories = [
   },
 ]
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: i * 0.12 },
-  }),
-}
+const viewport = { once: true, amount: 0.3 }
 
 function Portfolio() {
-  const [center, setCenter] = useState(3)
+  const reducedMotion = usePrefersReducedMotion()
+  const variants = motionVariants(fadeUp, reducedMotion)
+  const { active: center, goToAndResetAutoPlay } = useCarousel({
+    itemCount: categories.length,
+    initialIndex: 3,
+    autoPlayInterval: 2000,
+  })
   const total = categories.length
-  const timerRef = useRef(null)
-
-  const next = useCallback(() => setCenter((c) => (c + 1) % total), [total])
-
-  const startAutoPlay = useCallback(() => {
-    clearInterval(timerRef.current)
-    timerRef.current = setInterval(next, 2000)
-  }, [next])
-
-  useEffect(() => {
-    startAutoPlay()
-    return () => clearInterval(timerRef.current)
-  }, [startAutoPlay])
-
-  const handleManual = (fn) => {
-    fn()
-    startAutoPlay()
-  }
 
   return (
     <section className="portfolio section" id="portfolio">
@@ -71,30 +54,30 @@ function Portfolio() {
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         <motion.p
           className="section-label"
-          variants={fadeUp}
+          variants={variants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={viewport}
           custom={0}
         >
           Our Portfolio
         </motion.p>
         <motion.h2
           className="portfolio-title"
-          variants={fadeUp}
+          variants={variants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={viewport}
           custom={1}
         >
           Collection
         </motion.h2>
         <motion.p
           className="portfolio-intro"
-          variants={fadeUp}
+          variants={variants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={viewport}
           custom={2}
         >
           We lead projects end-to-end and orchestrate the ecosystem required for success.
@@ -120,14 +103,14 @@ function Portfolio() {
 
             return (
               <div
-                key={i}
+                key={cat.title}
                 className={`portfolio-card ${offset === 0 ? 'portfolio-card--active' : ''}`}
                 style={{
                   transform: `translate(-50%, -50%) translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                   opacity,
                   zIndex,
                 }}
-                onClick={() => handleManual(() => setCenter(i))}
+                onClick={() => goToAndResetAutoPlay(i)}
               >
                 <img src={cat.image} alt={cat.title} loading="lazy" />
                 <div className="portfolio-card-label">

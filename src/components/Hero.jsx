@@ -1,20 +1,16 @@
 import { motion } from 'framer-motion'
 import YoutubeAutoplayIframe from './YoutubeAutoplayIframe'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
+import { fadeIn, motionVariants } from '../animations'
 import './Hero.css'
 
 const YOUTUBE_ID = 'mVXuN28Ismk'
 const START_SEC = 15
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 + i * 0.2 },
-  }),
-}
-
 function Hero() {
+  const reducedMotion = usePrefersReducedMotion()
+  const variants = motionVariants(fadeIn, reducedMotion)
+
   return (
     <section className="hero">
       <div className="hero-video-wrapper">
@@ -31,7 +27,7 @@ function Hero() {
       <div className="hero-content container">
         <motion.p
           className="hero-tagline"
-          variants={fadeIn}
+          variants={variants}
           initial="hidden"
           animate="visible"
           custom={0}
@@ -40,7 +36,7 @@ function Hero() {
         </motion.p>
         <motion.h1
           className="hero-title"
-          variants={fadeIn}
+          variants={variants}
           initial="hidden"
           animate="visible"
           custom={1}
@@ -51,7 +47,7 @@ function Hero() {
         <motion.a
           href="#contact"
           className="btn-primary"
-          variants={fadeIn}
+          variants={variants}
           initial="hidden"
           animate="visible"
           custom={2}

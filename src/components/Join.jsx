@@ -1,6 +1,8 @@
-import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ShootingStarsBg from './ShootingStarsBg'
+import { useCarousel } from '../hooks/useCarousel'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
+import { joinMotion } from '../animations'
 import './Join.css'
 
 const SLIDES = [
@@ -31,9 +33,11 @@ const SLIDES = [
 ]
 
 function Join() {
-  const [active, setActive] = useState(0)
-
+  const { active, goTo } = useCarousel({ itemCount: SLIDES.length })
+  const reducedMotion = usePrefersReducedMotion()
+  const slideMotion = joinMotion(reducedMotion)
   const current = SLIDES[active]
+  const indexLabel = String(active + 1).padStart(2, '0')
 
   return (
     <section className="join section" id="join">
@@ -58,7 +62,7 @@ function Join() {
                     <button
                       type="button"
                       className={`join-nav-item ${active === i ? 'join-nav-item--active' : ''}`}
-                      onClick={() => setActive(i)}
+                      onClick={() => goTo(i)}
                     >
                       <span className="join-nav-line">
                         <span className="join-nav-heading">
@@ -83,15 +87,15 @@ function Join() {
                 <motion.div
                   key={current.title}
                   className="join-editorial-inner"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.42, ease: [0.25, 0.1, 0.25, 1] }}
+                  initial={slideMotion.initial}
+                  animate={slideMotion.animate}
+                  exit={slideMotion.exit}
+                  transition={slideMotion.transition}
                 >
                   <span className="join-editorial-watermark" aria-hidden>
-                    {String(active + 1).padStart(2, '0')}
+                    {indexLabel}
                   </span>
-                  <span className="join-editorial-index">({String(active + 1).padStart(2, '0')})</span>
+                  <span className="join-editorial-index">({indexLabel})</span>
                   <h3 className="join-editorial-title">{current.title}</h3>
                   <p className="join-editorial-lede">{current.description}</p>
                   <span className="join-editorial-rule" />
@@ -110,8 +114,8 @@ function Join() {
                     role="tab"
                     aria-selected={active === i}
                     className={`join-progress-dot ${active === i ? 'join-progress-dot--active' : ''}`}
-                    onClick={() => setActive(i)}
-                    aria-label={`${slide.title}`}
+                    onClick={() => goTo(i)}
+                    aria-label={slide.title}
                   />
                 ))}
               </div>
