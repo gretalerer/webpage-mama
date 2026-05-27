@@ -320,17 +320,57 @@
 
 .contact-form--done {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 280px;
+  text-align: center;
+  gap: 1rem;
+  min-height: 360px;
 }
 
-.contact-done-placeholder {
+.contact-done-title {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
-  color: var(--color-text-muted);
-  text-align: center;
+  font-size: clamp(2rem, 4.5vw, 2.85rem);
+  font-weight: 500;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
   margin: 0;
+}
+
+.contact-done-title::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--color-accent);
+  margin: 0.85rem auto 0;
+}
+
+.contact-done-text {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  max-width: 32rem;
+  margin: 0;
+}
+
+.contact-error {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: #9a4a4a;
+  background: rgba(154, 74, 74, 0.08);
+  border: 1px solid rgba(154, 74, 74, 0.25);
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+.contact-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 /* ── Responsive ── */

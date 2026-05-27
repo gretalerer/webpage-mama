@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import contactBg from '../assets/contact-bg.png'
 import './Contact.css'
 
@@ -6,17 +6,36 @@ const FORM_ID = import.meta.env.VITE_FORMSPREE_FORM_ID?.trim() || 'mredrley'
 const FORM_ACTION = `https://formspree.io/f/${FORM_ID}`
 
 function Contact() {
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [errorMsg, setErrorMsg] = useState('')
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('sent') === '1') {
-      setSent(true)
-      window.history.replaceState({}, '', `${window.location.pathname}#contact`)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setStatus('sending')
+    setErrorMsg('')
+
+    try {
+      const res = await fetch(FORM_ACTION, {
+        method: 'POST',
+        body: new FormData(e.currentTarget),
+        headers: { Accept: 'application/json' },
+      })
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok || data.ok === false) {
+        throw new Error(
+          data.error ||
+            (Array.isArray(data.errors) ? data.errors.map((x) => x.message).join(' ') : '') ||
+            `Submission failed (${res.status})`
+        )
+      }
+
+      setStatus('sent')
+    } catch (err) {
+      setErrorMsg(err.message || 'Something went wrong. Please try again.')
+      setStatus('error')
     }
-  }, [])
-
-  const nextUrl = `${window.location.origin}${window.location.pathname}?sent=1#contact`
+  }
 
   return (
     <section className="contact section" id="contact">
@@ -40,37 +59,28 @@ function Contact() {
           </div>
         </div>
 
-        {sent && (
-          <div className="contact-banner contact-banner--success" role="status">
-            <p className="contact-banner-title">Request received</p>
-            <p className="contact-banner-text">
-              Thank you — we&apos;ve got your message and will be in touch shortly.
-            </p>
-            <button
-              type="button"
-              className="contact-banner-action"
-              onClick={() => setSent(false)}
-            >
-              Send another message
-            </button>
-          </div>
-        )}
-
         <div className="contact-body">
 
           <div className="contact-location-card">
             <img src={contactBg} alt="" className="contact-location-img" />
           </div>
 
-          {sent ? (
-            <div className="contact-form contact-form--done">
-              <p className="contact-done-placeholder">
-                Your message was submitted successfully.
+          {status === 'sent' ? (
+            <div className="contact-form contact-form--done" role="status" aria-live="polite">
+              <p className="contact-done-title">Thank you.</p>
+              <p className="contact-done-text">
+                We&apos;ve received your message and will reach out to you soon.
               </p>
+              <button
+                type="button"
+                className="contact-banner-action"
+                onClick={() => setStatus('idle')}
+              >
+                Send another message
+              </button>
             </div>
           ) : (
-            <form className="contact-form" action={FORM_ACTION} method="POST">
-              <input type="hidden" name="_next" value={nextUrl} />
+            <form className="contact-form" action={FORM_ACTION} method="POST" onSubmit={handleSubmit}>
               <input type="hidden" name="_subject" value="Movements Capital — Contact form" />
 
               <div className="contact-form-row">
@@ -84,6 +94,7 @@ function Contact() {
                     placeholder="ALEXANDER VANCE"
                     required
                     autoComplete="name"
+                    disabled={status === 'sending'}
                   />
                 </div>
                 <div className="contact-field">
@@ -96,6 +107,7 @@ function Contact() {
                     placeholder="NAME@INSTITUTION.COM"
                     required
                     autoComplete="email"
+                    disabled={status === 'sending'}
                   />
                 </div>
               </div>
@@ -109,6 +121,7 @@ function Contact() {
                   name="organization"
                   placeholder="FIRM NAME"
                   autoComplete="organization"
+                  disabled={status === 'sending'}
                 />
               </div>
 
@@ -120,6 +133,7 @@ function Contact() {
                     className="contact-select"
                     name="inquiry"
                     defaultValue="Investor Relations"
+                    disabled={status === 'sending'}
                   >
                     <option>Investor Relations</option>
                     <option>Partnership</option>
@@ -140,13 +154,22 @@ function Contact() {
                   placeholder="HOW CAN WE ACCELERATE YOUR MOVEMENT?"
                   rows={4}
                   required
+                  disabled={status === 'sending'}
                 />
               </div>
 
+              {status === 'error' && (
+                <p className="contact-error" role="alert">{errorMsg}</p>
+              )}
+
               <div className="contact-form-footer">
                 <span className="contact-secure">TLS encrypted in transit</span>
-                <button type="submit" className="contact-submit">
-                  SUBMIT REQUEST →
+                <button
+                  type="submit"
+                  className="contact-submit"
+                  disabled={status === 'sending'}
+                >
+                  {status === 'sending' ? 'SENDING…' : 'SUBMIT REQUEST →'}
                 </button>
               </div>
             </form>
